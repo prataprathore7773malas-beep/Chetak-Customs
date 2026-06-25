@@ -360,8 +360,7 @@ align-items:center;
 
 text-align:center;
 
-background:url(images/chs.jpg);
-
+background:url("images/chs.jpeg");
 background-size:cover;
 
 background-position:center;
