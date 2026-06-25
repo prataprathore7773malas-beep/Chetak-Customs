@@ -6,28 +6,68 @@
 
 
 /*=========================================
+        LOADER
+=========================================*/
+
+window.addEventListener("load", function () {
+
+    const loader = document.querySelector(".loader");
+
+    setTimeout(() => {
+
+        loader.style.opacity = "0";
+
+        loader.style.visibility = "hidden";
+
+    }, 1800);
+
+});
+
+
+
+
+
+/*=========================================
         STICKY HEADER
 =========================================*/
 
-const header = document.querySelector("header");
+const header = document.getElementById("header");
 
 window.addEventListener("scroll", () => {
 
     if (window.scrollY > 80) {
 
-        header.style.background = "#000";
-        header.style.padding = "14px 8%";
-        header.style.boxShadow = "0 10px 30px rgba(0,0,0,.4)";
+        header.classList.add("sticky");
 
     } else {
 
-        header.style.background = "rgba(0,0,0,.35)";
-        header.style.padding = "20px 8%";
-        header.style.boxShadow = "none";
+        header.classList.remove("sticky");
 
     }
 
 });
+
+
+
+
+
+/*=========================================
+        MOBILE MENU
+=========================================*/
+
+const menuBtn = document.getElementById("menuBtn");
+
+const navbar = document.getElementById("navbar");
+
+menuBtn.onclick = () => {
+
+    navbar.classList.toggle("showMenu");
+
+    menuBtn.classList.toggle("active");
+
+};
+
+
 
 
 
@@ -37,15 +77,17 @@ window.addEventListener("scroll", () => {
 
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
-    anchor.addEventListener("click", function(e){
+    anchor.addEventListener("click", function (e) {
 
         e.preventDefault();
 
         document.querySelector(this.getAttribute("href")).scrollIntoView({
 
-            behavior:"smooth"
+            behavior: "smooth"
 
         });
+
+        navbar.classList.remove("showMenu");
 
     });
 
@@ -53,29 +95,303 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 
 
+
+
+/*=========================================
+        ACTIVE MENU
+=========================================*/
+
+const sections = document.querySelectorAll("section");
+
+const navLinks = document.querySelectorAll("nav ul li a");
+
+window.addEventListener("scroll", () => {
+
+    let current = "";
+
+    sections.forEach(section => {
+
+        const sectionTop = section.offsetTop - 150;
+
+        const sectionHeight = section.clientHeight;
+
+        if (pageYOffset >= sectionTop) {
+
+            current = section.getAttribute("id");
+
+        }
+
+    });
+
+    navLinks.forEach(link => {
+
+        link.classList.remove("active");
+
+        if (link.getAttribute("href") == "#" + current) {
+
+            link.classList.add("active");
+
+        }
+
+    });
+
+});
+
+
+
+
+
+/*=========================================
+        SCROLL REVEAL
+=========================================*/
+
+const revealElements = document.querySelectorAll(
+
+".about,.story,.services,.why,.process,.featured-builds,.gallery,.reviews,.counter,.faq,.contact"
+
+);
+
+function reveal() {
+
+    const trigger = window.innerHeight - 100;
+
+    revealElements.forEach(el => {
+
+        const top = el.getBoundingClientRect().top;
+
+        if (top < trigger) {
+
+            el.classList.add("show");
+
+        }
+
+    });
+
+}
+
+window.addEventListener("scroll", reveal);
+
+reveal();
+
+
+
+
+
+/*=========================================
+        HERO PARALLAX
+=========================================*/
+
+window.addEventListener("scroll", () => {
+
+    const hero = document.querySelector(".hero");
+
+    let value = window.scrollY;
+
+    hero.style.backgroundPositionY = value * 0.45 + "px";
+
+});
+
+
+
+
+
+/*=========================================
+        BUTTON ANIMATION
+=========================================*/
+
+const buttons = document.querySelectorAll(".btn,.btn-outline");
+
+buttons.forEach(btn => {
+
+    btn.addEventListener("mouseenter", () => {
+
+        btn.style.transform = "translateY(-8px)";
+
+    });
+
+    btn.addEventListener("mouseleave", () => {
+
+        btn.style.transform = "translateY(0px)";
+
+    });
+
+}); /*=========================================
+        COUNTER ANIMATION
+=========================================*/
+
+const counters = document.querySelectorAll(".count");
+
+const counterObserver = new IntersectionObserver((entries) => {
+
+    entries.forEach(entry => {
+
+        if (entry.isIntersecting) {
+
+            const counter = entry.target;
+
+            const target = +counter.getAttribute("data-target");
+
+            let count = 0;
+
+            const speed = target / 120;
+
+            const update = () => {
+
+                count += speed;
+
+                if (count < target) {
+
+                    counter.innerText = Math.ceil(count);
+
+                    requestAnimationFrame(update);
+
+                } else {
+
+                    if(target == 100){
+
+                        counter.innerText = target + "%";
+
+                    }else{
+
+                        counter.innerText = target + "+";
+
+                    }
+
+                }
+
+            };
+
+            update();
+
+            counterObserver.unobserve(counter);
+
+        }
+
+    });
+
+},{threshold:.5});
+
+counters.forEach(counter=>{
+
+counterObserver.observe(counter);
+
+});
+
+
+
+
+
+/*=========================================
+        FAQ ACCORDION
+=========================================*/
+
+const faqItems=document.querySelectorAll(".faq-item");
+
+faqItems.forEach(item=>{
+
+const question=item.querySelector(".faq-question");
+
+const answer=item.querySelector(".faq-answer");
+
+const icon=question.querySelector("span");
+
+question.onclick=()=>{
+
+faqItems.forEach(other=>{
+
+if(other!==item){
+
+other.querySelector(".faq-answer").style.display="none";
+
+other.querySelector("span").innerHTML="+";
+
+}
+
+});
+
+if(answer.style.display==="block"){
+
+answer.style.display="none";
+
+icon.innerHTML="+";
+
+}
+
+else{
+
+answer.style.display="block";
+
+icon.innerHTML="−";
+
+}
+
+};
+
+});
+
+
+
+
+
+/*=========================================
+        GALLERY LIGHTBOX
+=========================================*/
+
+const gallery=document.querySelectorAll(".gallery-container img");
+
+gallery.forEach(img=>{
+
+img.addEventListener("click",()=>{
+
+const popup=document.createElement("div");
+
+popup.className="lightbox";
+
+popup.innerHTML=`
+
+<img src="${img.src}">
+
+`;
+
+document.body.appendChild(popup);
+
+popup.onclick=()=>{
+
+popup.remove();
+
+};
+
+});
+
+});
+
+
+
+
+
 /*=========================================
         SCROLL TO TOP
 =========================================*/
 
-const topBtn = document.getElementById("topBtn");
+const topBtn=document.getElementById("topBtn");
 
 window.addEventListener("scroll",()=>{
 
-    if(window.pageYOffset > 500){
+if(window.scrollY>600){
 
-        topBtn.style.display="block";
+topBtn.style.display="flex";
 
-    }
+}
 
-    else{
+else{
 
-        topBtn.style.display="none";
+topBtn.style.display="none";
 
-    }
+}
 
 });
 
-topBtn.onclick=function(){
+topBtn.onclick=()=>{
 
 window.scrollTo({
 
@@ -89,211 +405,10 @@ behavior:"smooth"
 
 
 
-/*=========================================
-        ACTIVE NAV LINK
-=========================================*/
-
-const sections=document.querySelectorAll("section");
-const navLinks=document.querySelectorAll("nav ul li a");
-
-window.addEventListener("scroll",()=>{
-
-let current="";
-
-sections.forEach(section=>{
-
-const sectionTop=section.offsetTop-150;
-
-const sectionHeight=section.clientHeight;
-
-if(pageYOffset>=sectionTop){
-
-current=section.getAttribute("id");
-
-}
-
-});
-
-navLinks.forEach(link=>{
-
-link.classList.remove("active");
-
-if(link.getAttribute("href")==="#"+current){
-
-link.classList.add("active");
-
-}
-
-});
-
-});
-
 
 
 /*=========================================
-        COUNTER ANIMATION
-=========================================*/
-
-const counters=document.querySelectorAll(".stat h1");
-
-const speed=120;
-
-counters.forEach(counter=>{
-
-const updateCount=()=>{
-
-const target=+counter.innerText.replace("+","").replace("%","");
-
-const count=+counter.getAttribute("data-count")||0;
-
-const increment=target/speed;
-
-if(count<target){
-
-const value=Math.ceil(count+increment);
-
-counter.setAttribute("data-count",value);
-
-if(counter.innerText.includes("%")){
-
-counter.innerText=value+"%";
-
-}else{
-
-counter.innerText=value+"+";
-
-}
-
-setTimeout(updateCount,20);
-
-}
-
-};
-
-updateCount();
-
-});
-
-
-
-/*=========================================
-        SCROLL REVEAL
-=========================================*/
-
-const reveal=document.querySelectorAll(
-
-".about,.story,.services,.why,.process,.stats,.featured,.gallery,.reviews,.faq,.contact"
-
-);
-
-window.addEventListener("scroll",revealSection);
-
-function revealSection(){
-
-const trigger=window.innerHeight-120;
-
-reveal.forEach(section=>{
-
-const top=section.getBoundingClientRect().top;
-
-if(top<trigger){
-
-section.classList.add("show");
-
-}
-
-});
-
-}
-
-revealSection();
-
-
-
-/*=========================================
-        IMAGE HOVER EFFECT
-=========================================*/
-
-const images=document.querySelectorAll(".gallery img,.build img");
-
-images.forEach(image=>{
-
-image.addEventListener("mouseenter",()=>{
-
-image.style.filter="brightness(110%)";
-
-});
-
-image.addEventListener("mouseleave",()=>{
-
-image.style.filter="brightness(100%)";
-
-});
-
-});
-
-
-
-/*=========================================
-        BUTTON RIPPLE EFFECT
-=========================================*/
-
-const buttons=document.querySelectorAll(".btn,.btn2");
-
-buttons.forEach(button=>{
-
-button.addEventListener("mouseenter",()=>{
-
-button.style.transform="translateY(-8px) scale(1.03)";
-
-});
-
-button.addEventListener("mouseleave",()=>{
-
-button.style.transform="translateY(0px) scale(1)";
-
-});
-
-});
-
-
-
-/*=========================================
-        PARALLAX HERO
-=========================================*/
-
-window.addEventListener("scroll",()=>{
-
-const hero=document.querySelector(".hero");
-
-let offset=window.pageYOffset;
-
-hero.style.backgroundPositionY=offset*0.5+"px";
-
-});
-
-
-
-/*=========================================
-        FAQ EFFECT
-=========================================*/
-
-const faq=document.querySelectorAll(".faq-item");
-
-faq.forEach(item=>{
-
-item.addEventListener("click",()=>{
-
-item.classList.toggle("open");
-
-});
-
-});
-
-
-
-/*=========================================
-        FLOATING WHATSAPP
+        FLOATING BUTTON
 =========================================*/
 
 const whatsapp=document.querySelector(".whatsapp");
@@ -310,7 +425,7 @@ transform:"translateY(0px)"
 
 {
 
-transform:"translateY(-12px)"
+transform:"translateY(-10px)"
 
 },
 
@@ -322,7 +437,7 @@ transform:"translateY(0px)"
 
 ],{
 
-duration:1500
+duration:1400
 
 });
 
@@ -330,8 +445,10 @@ duration:1500
 
 
 
+
+
 /*=========================================
-        HERO TITLE ANIMATION
+        HERO TITLE GLOW
 =========================================*/
 
 const heroTitle=document.querySelector(".hero-content h1");
@@ -342,9 +459,9 @@ heroTitle.animate([
 
 {
 
-opacity:0.7,
+opacity:.9,
 
-letterSpacing:"8px"
+letterSpacing:"6px"
 
 },
 
@@ -352,15 +469,15 @@ letterSpacing:"8px"
 
 opacity:1,
 
-letterSpacing:"12px"
+letterSpacing:"10px"
 
 },
 
 {
 
-opacity:0.7,
+opacity:.9,
 
-letterSpacing:"8px"
+letterSpacing:"6px"
 
 }
 
@@ -374,93 +491,13 @@ duration:2500
 
 
 
-/*=========================================
-        LOADING SCREEN
-=========================================*/
-
-window.addEventListener("load",()=>{
-
-const loader=document.querySelector(".loader");
-
-if(loader){
-
-loader.style.opacity="0";
-
-setTimeout(()=>{
-
-loader.style.display="none";
-
-},600);
-
-}
-
-});
-
 
 
 /*=========================================
-        GALLERY LIGHTBOX
+        CONTACT FORM
 =========================================*/
 
-const galleryImages=document.querySelectorAll(".gallery img");
-
-galleryImages.forEach(img=>{
-
-img.addEventListener("click",()=>{
-
-const popup=document.createElement("div");
-
-popup.style.position="fixed";
-
-popup.style.left="0";
-
-popup.style.top="0";
-
-popup.style.width="100%";
-
-popup.style.height="100%";
-
-popup.style.background="rgba(0,0,0,.92)";
-
-popup.style.display="flex";
-
-popup.style.alignItems="center";
-
-popup.style.justifyContent="center";
-
-popup.style.zIndex="99999";
-
-const image=document.createElement("img");
-
-image.src=img.src;
-
-image.style.maxWidth="90%";
-
-image.style.maxHeight="90%";
-
-image.style.borderRadius="12px";
-
-popup.appendChild(image);
-
-document.body.appendChild(popup);
-
-popup.onclick=()=>{
-
-popup.remove();
-
-};
-
-});
-
-});
-
-
-
-/*=========================================
-        PREVENT FORM RELOAD
-=========================================*/
-
-const form=document.querySelector("form");
+const form=document.getElementById("contactForm");
 
 if(form){
 
@@ -468,7 +505,7 @@ form.addEventListener("submit",(e)=>{
 
 e.preventDefault();
 
-alert("Thank you! We will contact you soon.");
+alert("Thank You! Your message has been sent successfully.");
 
 form.reset();
 
@@ -478,4 +515,124 @@ form.reset();
 
 
 
-console.log("CHETAK CUSTOMS WEBSITE LOADED SUCCESSFULLY");
+
+
+/*=========================================
+        IMAGE LAZY EFFECT
+=========================================*/
+
+const images=document.querySelectorAll("img");
+
+const imgObserver=new IntersectionObserver((entries)=>{
+
+entries.forEach(entry=>{
+
+if(entry.isIntersecting){
+
+entry.target.style.opacity="1";
+
+entry.target.style.transform="scale(1)";
+
+}
+
+});
+
+});
+
+images.forEach(img=>{
+
+img.style.opacity="0";
+
+img.style.transform="scale(.95)";
+
+img.style.transition=".8s";
+
+imgObserver.observe(img);
+
+});
+
+
+
+
+
+/*=========================================
+        LIGHTBOX CSS
+=========================================*/
+
+const style=document.createElement("style");
+
+style.innerHTML=`
+
+.lightbox{
+
+position:fixed;
+
+left:0;
+
+top:0;
+
+width:100%;
+
+height:100%;
+
+background:rgba(0,0,0,.95);
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+z-index:999999;
+
+cursor:pointer;
+
+}
+
+.lightbox img{
+
+max-width:90%;
+
+max-height:90%;
+
+border-radius:15px;
+
+box-shadow:0 20px 50px rgba(0,0,0,.5);
+
+animation:zoom .4s ease;
+
+}
+
+@keyframes zoom{
+
+from{
+
+transform:scale(.7);
+
+opacity:0;
+
+}
+
+to{
+
+transform:scale(1);
+
+opacity:1;
+
+}
+
+}
+
+`;
+
+document.head.appendChild(style);
+
+
+
+
+
+/*=========================================
+        CONSOLE
+=========================================*/
+
+console.log("✅ CHETAK CUSTOMS WEBSITE LOADED SUCCESSFULLY"); 
